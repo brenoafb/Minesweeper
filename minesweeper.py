@@ -113,6 +113,19 @@ class Display:
             self.__expand_neighbors(grid, i, j)
 
         return False
+    
+    def won(self, grid, i, j):
+        not_explored = 0
+
+        for line in self.hidden:
+            for cell_is_hidden in line:
+                if cell_is_hidden:
+                    not_explored += 1
+        
+        if not_explored == self.m:
+            return True
+        
+        return False
         
     def flag(self, grid, i, j):
         self.flagged[i][j] = True
@@ -122,23 +135,29 @@ class Display:
         return False
 
 n = 9
-m = 10
+m = 3
 lose = False
 grid = Grid(n,m)
 grid.print()
 d = Display(n, m)
-d.display(grid)
 
-while not lose:
+while True:
+    d.display(grid)
+
     t = input('s/f: ')
     i, j = map(int, input('i j: ').split())
+
     if t == "s":
-        lose = d.show(grid, i, j)
+        if d.show(grid, i, j):
+            print("You lost :(")
+            break
+        else:
+            if d.won(grid, i, j):
+                print("You won :)")
+                break
     elif t == 'f':
         d.flag(grid, i, j)
     else:
         print('Invalid move')
-    d.display(grid)
 
-print('You lost!')
-d.display_all(grid)
+
