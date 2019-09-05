@@ -17,13 +17,11 @@ class Grid:
                     self.a[i][j] = self.count_bombs(i, j)
 
     def count_bombs(self, i, j):
-        increments = [(i-1,j-1), (i, j-1), (i+1, j-1),
-                      (i-1,j),   (i, j),   (i+1, j),
-                      (i-1,j+1), (i, j+1), (i+1, j+1)]
-        f = lambda p : p[0] >= 0 and p[1] >= 0 and p[0] < self.n and p[1] < self.n
-        increments = list(filter(f, increments))
-        indices = np.array(list(map(lambda p : self.n*p[0] + p[1], increments)))
-        bombs = np.array(list(map(lambda x : 1 if x == -1 else 0, self.a.flatten())))
+        increments = [(p[0]+i, p[1]+j) for p in [(x,y) for x in [-1,0,1] for y in [-1,0,1]]]
+        pred = lambda p : p[0] >= 0 and p[1] >= 0 and p[0] < self.n and p[1] < self.n
+        increments = list(filter(pred, increments))
+        indices = np.array([self.n*p[0] + p[1] for p in increments])
+        bombs = np.array([1 if x == -1 else 0 for x in self.a.flatten()])
         return np.sum(bombs[indices])
 
     def print(self):
@@ -31,7 +29,7 @@ class Grid:
         print(self.a)
 
 class Display:
-    n = 0
+    m = 0
     n = 0
     hidden = []
     flagged = []
@@ -75,17 +73,14 @@ class Display:
             print('')
 
     def __get_neighbors(self, grid, i, j):
-        increments = [(i-1,j-1), (i, j-1), (i+1, j-1),
-                      (i-1,j), (i+1, j), (i-1,j+1), (i, j+1),
-                      (i+1, j+1)]
-        
+        increments = [(p[0]+i, p[1]+j) for p in [(x,y) for x in [-1,0,1] for y in [-1,0,1]]]
         neighbors = []
 
         for inc in increments:
             if (inc[0] < 0) or (inc[1] < 0) or\
                (inc[0] >= grid.n) or (inc[1] >= grid.n):
                continue
-            
+
             neighbors.append(inc)
 
         return neighbors
@@ -102,18 +97,18 @@ class Display:
                     self.__expand_neighbors(grid, i_, j_)
             else:
                 self.hidden[i_][j_] = False
-    
+
     def show(self, grid, i, j):
         self.hidden[i][j] = False
 
         if grid.a[i][j] == -1:
             return True
-        
+
         if grid.a[i][j] == 0:
             self.__expand_neighbors(grid, i, j)
 
         return False
-    
+
     def won(self, grid, i, j):
         not_explored = 0
 
@@ -121,12 +116,12 @@ class Display:
             for cell_is_hidden in line:
                 if cell_is_hidden:
                     not_explored += 1
-        
+
         if not_explored == self.m:
             return True
-        
+
         return False
-        
+
     def flag(self, grid, i, j):
         self.flagged[i][j] = True
         if grid.a[i][j] == -1:
@@ -159,5 +154,3 @@ while True:
         d.flag(grid, i, j)
     else:
         print('Invalid move')
-
-
