@@ -17,7 +17,7 @@ class Grid:
                     self.a[i][j] = self.count_bombs(i, j)
 
     def count_bombs(self, i, j):
-        increments = [(p[0]+i, p[1]+j) for p in [(x,y) for x in [-1,0,1] for y in [-1,0,1]]]
+        increments = [(i+x,j+y) for x in [-1,0,1] for y in [-1,0,1]]
         pred = lambda p : p[0] >= 0 and p[1] >= 0 and p[0] < self.n and p[1] < self.n
         increments = list(filter(pred, increments))
         indices = np.array([self.n*p[0] + p[1] for p in increments])
@@ -45,7 +45,12 @@ class Display:
         self.flagged = np.zeros((n,n)) != 0
 
     def display(self, grid):
+        print('    ', end='')
+        for k in range(self.n):
+            print(k, end=' ')
+        print(' ')
         for i in range(n):
+            print('{:3d}'.format(i), end=' ')
             for j in range(n):
                 if self.flagged[i][j]:
                     print(self.flagchar, end=' ')
@@ -73,7 +78,7 @@ class Display:
             print('')
 
     def __get_neighbors(self, grid, i, j):
-        increments = [(p[0]+i, p[1]+j) for p in [(x,y) for x in [-1,0,1] for y in [-1,0,1]]]
+        increments = [(i+x,j+y) for x in [-1,0,1] for y in [-1,0,1]]
         neighbors = []
 
         for inc in increments:
@@ -123,7 +128,9 @@ class Display:
         return False
 
     def flag(self, grid, i, j):
-        self.flagged[i][j] = True
+        if self.hidden[i][j]:
+            self.flagged[i][j] = True
+            self.hidden[i][j] = False
         if grid.a[i][j] == -1:
             return True
         self.m -= 1
