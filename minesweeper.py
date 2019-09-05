@@ -105,10 +105,12 @@ class Display:
     
     def show(self, grid, i, j):
         self.hidden[i][j] = False
+
         if grid.a[i][j] == -1:
             return True
         
-        self.__expand_neighbors(grid, i, j)
+        if grid.a[i][j] == 0:
+            self.__expand_neighbors(grid, i, j)
 
         return False
         
@@ -120,17 +122,16 @@ class Display:
         return False
 
 n = 9
-m = 4
+m = 10
 lose = False
-grid = Grid(9,4)
+grid = Grid(n,m)
 grid.print()
 d = Display(n, m)
 d.display(grid)
 
 while not lose:
     t = input('s/f: ')
-    i = int(input('i: '))
-    j = int(input('j: '))
+    i, j = map(int, input('i j: ').split())
     if t == "s":
         lose = d.show(grid, i, j)
     elif t == 'f':
