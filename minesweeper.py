@@ -90,17 +90,16 @@ class Display:
 
         return neighbors
 
-    def __expand_neighbors(self, grid, i, j, expanded):
+    def __expand_neighbors(self, grid, i, j):
         neighbors = self.__get_neighbors(grid, i, j)
 
         for n in neighbors:
             i_, j_ = n
 
             if (0 == grid.a[i_][j_]):
-                if (n not in expanded):
-                    expanded.append(n)
+                if self.hidden[i_][j_]:
                     self.hidden[i_][j_] = False
-                    self.__expand_neighbors(grid, i_, j_, expanded)
+                    self.__expand_neighbors(grid, i_, j_)
             else:
                 self.hidden[i_][j_] = False
     
@@ -109,8 +108,7 @@ class Display:
         if grid.a[i][j] == -1:
             return True
         
-        exps = [(i, j)]
-        self.__expand_neighbors(grid, i, j, exps)
+        self.__expand_neighbors(grid, i, j)
 
         return False
         
