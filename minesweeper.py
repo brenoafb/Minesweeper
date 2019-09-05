@@ -74,12 +74,46 @@ class Display:
                     print(grid.a[i][j], end=' ')
             print('')
 
+    def __get_neighbors(self, grid, i, j):
+        increments = [(i-1,j-1), (i, j-1), (i+1, j-1),
+                      (i-1,j), (i+1, j), (i-1,j+1), (i, j+1),
+                      (i+1, j+1)]
+        
+        neighbors = []
+
+        for inc in increments:
+            if (inc[0] < 0) or (inc[1] < 0) or\
+               (inc[0] >= grid.n) or (inc[1] >= grid.n):
+               continue
+            
+            neighbors.append(inc)
+
+        return neighbors
+
+    def __expand_neighbors(self, grid, i, j, expanded):
+        neighbors = self.__get_neighbors(grid, i, j)
+
+        for n in neighbors:
+            i_, j_ = n
+
+            if (0 == grid.a[i_][j_]):
+                if (n not in expanded):
+                    expanded.append(n)
+                    self.hidden[i_][j_] = False
+                    self.__expand_neighbors(grid, i_, j_, expanded)
+            else:
+                self.hidden[i_][j_] = False
+    
     def show(self, grid, i, j):
         self.hidden[i][j] = False
         if grid.a[i][j] == -1:
             return True
-        return False
+        
+        exps = [(i, j)]
+        self.__expand_neighbors(grid, i, j, exps)
 
+        return False
+        
     def flag(self, grid, i, j):
         self.flagged[i][j] = True
         if grid.a[i][j] == -1:
